@@ -1,7 +1,7 @@
-
 import { readContract } from "@/lib/server";
 import { getBalance } from "@/lib/server";
-import { AidraSmartWalletABI } from "@/lib/abi/AidraSmartWalletAbi";
+import AidraSmartWalletABI from "@aidra/contracts/AidraSmartWallet";
+import type { Abi } from "viem";
 import { formatNumber } from "./format";
 
 
@@ -16,12 +16,12 @@ export async function fetchWalletBalance(smartAccountAddress: `0x${string}`) {
   const [availableBalance, committedFunds] = await Promise.all([
     readContract({
       address: smartAccountAddress,
-      abi:  AidraSmartWalletABI,
+      abi:  AidraSmartWalletABI as Abi,
       functionName: "getAvailableBalance",
     }),
     readContract({
       address: smartAccountAddress,
-      abi:  AidraSmartWalletABI,
+      abi:  AidraSmartWalletABI as Abi,
       functionName: "s_committedFunds",
     }),
   ]);

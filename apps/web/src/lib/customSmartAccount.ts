@@ -5,6 +5,7 @@ import { recoverAddress, hashMessage } from "viem";
 import { AidraSmartWalletFactoryAddress } from "./CA";
 import AidraSmartWalletABI from "@aidra/contracts/AidraSmartWallet";
 import { encodeFunctionData, decodeFunctionData, concat, pad, toHex } from "viem";
+import type { Abi } from "viem";
 import {
   useWallets,
   useSignMessage,
@@ -36,7 +37,7 @@ export default function CustomSmartAccount() {
   async function predictAddress(ownerAddress: `0x${string}`) {
     return publicClient.readContract({
       address: AidraSmartWalletFactoryAddress,
-      abi: AidraSmartWalletFactoryABI,
+      abi: AidraSmartWalletFactoryABI as Abi,
       functionName: "getPredictedAddress",
       args: [ownerAddress],
     }) as Promise<`0x${string}`>;
@@ -66,7 +67,7 @@ export default function CustomSmartAccount() {
         async decodeCalls(data) {
           try {
             const decoded = decodeFunctionData({
-              abi: AidraSmartWalletABI,
+              abi: AidraSmartWalletABI as Abi,
               data: data as `0x${string}`,
             });
 
@@ -95,7 +96,7 @@ export default function CustomSmartAccount() {
           if (calls.length === 1) {
             const call = calls[0];
             return encodeFunctionData({
-              abi: AidraSmartWalletABI,
+              abi: AidraSmartWalletABI as Abi,
               functionName: "execute",
               args: [call.to, call.value || 0n, call.data || "0x"],
             });
@@ -108,7 +109,7 @@ export default function CustomSmartAccount() {
           }));
           
           return encodeFunctionData({
-            abi: AidraSmartWalletABI,
+            abi: AidraSmartWalletABI as Abi,
             functionName: "executeBatch",
             args: [batchCalls],
           });
@@ -122,7 +123,7 @@ export default function CustomSmartAccount() {
           return {
             factory: AidraSmartWalletFactoryAddress,
             factoryData: encodeFunctionData({
-              abi: AidraSmartWalletFactoryABI,
+              abi: AidraSmartWalletFactoryABI as Abi,
               functionName: "createSmartAccount",
               args: [owner.address as `0x${string}`],
             }),

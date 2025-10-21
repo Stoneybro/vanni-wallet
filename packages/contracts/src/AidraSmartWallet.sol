@@ -11,10 +11,13 @@ import {IAidraSmartWallet} from "./IAidraSmartWallet.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 /**
- * @title AidraSmartWallet
+ * @title Aidra Smart Wallet
  * @author Zion Livingstone
- * @notice ERC-4337-compatible smart account for AI-powered intent automation.
+ * @notice ERC-4337-compatible smart account.
+ * @dev Integrates with Chainlink Automation for decentralized intent execution.
+ * @custom:security-contact stoneybrocrypto@gmail.com
  */
+
 contract AidraSmartWallet is IAccount, ReentrancyGuard, Initializable {
     /*//////////////////////////////////////////////////////////////
                                 TYPES
@@ -59,6 +62,16 @@ contract AidraSmartWallet is IAccount, ReentrancyGuard, Initializable {
     /// @notice Emitted when a transfer fails during intent execution.
     event TransferFailed(
         bytes32 indexed intentId, uint256 indexed transactionCount, address indexed recipient, uint256 amount
+    );
+    /// @notice Emitted when a single execute is performed
+    event Executed(address indexed target, uint256 value, bytes data);
+
+    /// @notice Emitted when a batch execute is performed
+    event ExecutedBatch(uint256 indexed batchSize, uint256 totalValue);
+
+    /// @notice Emitted when an intent batch transfer is executed
+    event IntentBatchTransferExecuted(
+        bytes32 indexed intentId, uint256 indexed transactionCount, uint256 recipientCount, uint256 totalValue
     );
 
     /*//////////////////////////////////////////////////////////////
@@ -140,7 +153,7 @@ contract AidraSmartWallet is IAccount, ReentrancyGuard, Initializable {
         assembly ("memory-safe") {
             if missingAccountFunds {
                 // Ignore failure (it's EntryPoint's job to verify, not the account's).
-                pop(call(gas(), caller(), missingAccountFunds, 0x00, 0x00, 0x00, 0x00))
+               pop(call(gas(), caller(), missingAccountFunds, codesize(), 0x00, codesize(), 0x00))
             }
         }
     }
@@ -167,8 +180,6 @@ contract AidraSmartWallet is IAccount, ReentrancyGuard, Initializable {
         if (_owner == address(0)) revert AidraSmartWallet__OwnerIsZeroAddress();
         s_owner = _owner;
     }
-
-
 
     /*//////////////////////////////////////////////////////////////
                               FUNCTIONS
@@ -250,6 +261,7 @@ contract AidraSmartWallet is IAccount, ReentrancyGuard, Initializable {
     {
         _checkCommitment(value);
         _call(target, value, data);
+        emit Executed(target, value, data);
     }
 
     /**
@@ -270,6 +282,7 @@ contract AidraSmartWallet is IAccount, ReentrancyGuard, Initializable {
         for (uint256 i; i < calls.length; i++) {
             _call(calls[i].target, calls[i].value, calls[i].data);
         }
+        emit ExecutedBatch(calls.length, totalValue);
     }
 
     /**
@@ -295,6 +308,7 @@ contract AidraSmartWallet is IAccount, ReentrancyGuard, Initializable {
         if (recipients.length == 0 || recipients.length != amounts.length) {
             revert AidraSmartWallet__InvalidBatchInput();
         }
+        uint256 totalValue=0;
 
         for (uint256 i; i < recipients.length; i++) {
             address recipient = recipients[i];
@@ -303,7 +317,7 @@ contract AidraSmartWallet is IAccount, ReentrancyGuard, Initializable {
             if (recipient == address(0) || amount == 0) {
                 revert AidraSmartWallet__InvalidBatchInput();
             }
-
+             totalValue += amount;
             (bool success,) = recipient.call{value: amount}("");
 
             if (!success) {
@@ -316,6 +330,7 @@ contract AidraSmartWallet is IAccount, ReentrancyGuard, Initializable {
                 // Skip mode: continue to next recipient
             }
         }
+        emit IntentBatchTransferExecuted(intentId, transactionCount, recipients.length, totalValue);
     }
 
     /**

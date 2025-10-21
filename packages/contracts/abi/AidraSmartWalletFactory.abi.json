@@ -6,11 +6,6 @@
         "name": "_implementation",
         "type": "address",
         "internalType": "address"
-      },
-      {
-        "name": "_intentRegistry",
-        "type": "address",
-        "internalType": "address"
       }
     ],
     "stateMutability": "nonpayable"
@@ -75,19 +70,6 @@
   {
     "type": "function",
     "name": "implementation",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "intentRegistry",
     "inputs": [],
     "outputs": [
       {

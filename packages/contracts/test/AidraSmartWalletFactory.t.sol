@@ -21,7 +21,7 @@ contract AidraSmartWalletFactoryTest is Test {
         implementation = new AidraSmartWallet(makeAddr("registry"));
 
         // Deploy factory with implementation
-        factory = new AidraSmartWalletFactory(address(implementation), makeAddr("registry"));
+        factory = new AidraSmartWalletFactory(address(implementation));
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -37,12 +37,12 @@ contract AidraSmartWalletFactoryTest is Test {
         address emptyAddress = makeAddr("empty");
 
         vm.expectRevert(AidraSmartWalletFactory.AidraSmartWalletFactory__ImplementationUndeployed.selector);
-        new AidraSmartWalletFactory(emptyAddress, address(0));
+        new AidraSmartWalletFactory(emptyAddress);
     }
 
     function test_Constructor_RevertsIfImplementationIsZeroAddress() public {
         vm.expectRevert(AidraSmartWalletFactory.AidraSmartWalletFactory__ImplementationUndeployed.selector);
-        new AidraSmartWalletFactory(address(0), address(0));
+        new AidraSmartWalletFactory(address(0));
     }
 
     /*//////////////////////////////////////////////////////////////

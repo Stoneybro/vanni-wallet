@@ -5,9 +5,10 @@ import {AidraSmartWallet} from "./AidraSmartWallet.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
 /**
- * @title AidraSmartWalletFactory
+ * @title Aidra Smart Wallet Factory
  * @author Zion Livingstone
- * @notice AidraSmartWallet factory, based on OpenZeppelin's Clones (ERC-1167).
+ * @notice Factory for deploying ERC-1167 minimal proxy clones of Aidra Smart Wallet.
+ * @custom:security-contact stoneybrocrypto@gmail.com
  */
 contract AidraSmartWalletFactory {
     /*//////////////////////////////////////////////////////////////
@@ -16,9 +17,6 @@ contract AidraSmartWalletFactory {
 
     /// @notice Address of the ERC-1167 implementation used as implementation for new accounts.
     address public immutable implementation;
-
-    /// @notice Address of the intent registry.
-    address public immutable intentRegistry;
 
     /// @notice Mapping from user EOA to deployed SmartAccount clone.
     mapping(address user => address clone) public userClones;
@@ -48,14 +46,12 @@ contract AidraSmartWalletFactory {
      *   AidraSmartWallet deployments.
      *
      * @param _implementation The address of the AidraSmartWallet implementation which new accounts will proxy to.
-     * @param _intentRegistry The address of the intent registry.
      */
-    constructor(address _implementation, address _intentRegistry) {
+    constructor(address _implementation) {
         if (_implementation.code.length == 0) {
             revert AidraSmartWalletFactory__ImplementationUndeployed();
         }
         implementation = _implementation;
-        intentRegistry = _intentRegistry;
     }
 
     /*//////////////////////////////////////////////////////////////

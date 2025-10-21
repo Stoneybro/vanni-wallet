@@ -78,50 +78,6 @@ export function useInternalTransactions(params: {
   });
 }
 
-// /**
-//  * Get all token balances (ERC20, NFTs, etc)
-//  */
-// export function useTokenBalances(params: {
-//   address?: Address;
-//   type?: "ERC-20" | "ERC-721" | "ERC-1155";
-//   enabled?: boolean;
-// }) {
-//   return useQuery({
-//     queryKey: blockscoutKeys.tokenBalances(params.address!),
-//     queryFn: () =>
-//       getTokenBalances({
-//         address: params.address!,
-//         type: params.type,
-//       }),
-//     enabled: (params.enabled ?? true) && !!params.address,
-//     staleTime: 60_000, // Token balances don't change as frequently
-//   });
-// }
-
-/**
- * Get token transfer history (for activity feed)
- */
-// export function useTokenTransfers(params: {
-//   address?: Address;
-//   type?: "ERC-20" | "ERC-721" | "ERC-1155";
-//   enabled?: boolean;
-// }) {
-//   return useInfiniteQuery({
-//     queryKey: blockscoutKeys.tokenTransfers(params.address!, params.type),
-//     queryFn: ({ pageParam = 1 }) =>
-//       getTokenTransfers({
-//         address: params.address!,
-//         type: params.type,
-//         page: pageParam,
-//         limit: 20,
-//       }),
-//     enabled: (params.enabled ?? true) && !!params.address,
-//     getNextPageParam: (lastPage) =>
-//       lastPage.next_page_params ? lastPage.next_page_params.page_number : undefined,
-//     initialPageParam: 1,
-//     staleTime: 30_000,
-//   });
-// }
 
 /**
  * Get single transaction details
@@ -137,36 +93,6 @@ export function useTransaction(params: {
     staleTime: Infinity, // Transactions don't change once confirmed
   });
 }
-
-/**
- * Get address metadata (name, tags, etc from Blockscout)
- */
-// export function useAddressInfo(params: {
-//   address?: Address;
-//   enabled?: boolean;
-// }) {
-//   return useQuery({
-//     queryKey: blockscoutKeys.addressInfo(params.address!),
-//     queryFn: () => getAddressInfo(params.address!),
-//     enabled: (params.enabled ?? true) && !!params.address,
-//     staleTime: 5 * 60_000, // Address info rarely changes
-//   });
-// }
-
-/**
- * Get token metadata
- */
-// export function useTokenInfo(params: {
-//   address?: Address;
-//   enabled?: boolean;
-// }) {
-//   return useQuery({
-//     queryKey: blockscoutKeys.tokenInfo(params.address!),
-//     queryFn: () => getTokenInfo(params.address!),
-//     enabled: (params.enabled ?? true) && !!params.address,
-//     staleTime: 5 * 60_000,
-//   });
-// }
 
 /**
  * Track UserOperation executions via EntryPoint events

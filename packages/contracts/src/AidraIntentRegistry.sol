@@ -5,6 +5,13 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {AutomationCompatibleInterface} from "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 import {IAidraSmartWallet} from "./IAidraSmartWallet.sol";
 
+/**
+ * @title Aidra Intent Registry  
+ * @author Zion Livingstone
+ * @notice Central registry for managing automated payment intents across all Aidra wallets.
+ * @dev Integrates with Chainlink Automation for decentralized intent execution.
+ * @custom:security-contact stoneybrocrypto@gmail.com
+ */
 contract AidraIntentRegistry is AutomationCompatibleInterface, ReentrancyGuard {
     /*//////////////////////////////////////////////////////////////
                                 TYPES
@@ -272,8 +279,7 @@ contract AidraIntentRegistry is AutomationCompatibleInterface, ReentrancyGuard {
         }
 
         ///@notice Check if the wallet has enough funds to cover the execution
-        uint256 availableBalance = IAidraSmartWallet(intent.wallet).getAvailableBalance();
-        if (totalAmount > availableBalance) return false;
+        if (totalAmount > intent.wallet.balance) return false;
 
         return true;
     }

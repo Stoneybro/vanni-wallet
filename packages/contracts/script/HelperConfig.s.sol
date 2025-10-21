@@ -56,7 +56,7 @@ contract HelperConfig is Script {
     }
 
     function getBaseSepoliaEthConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({implementation: 0x738DAF8cb17b3EB9a09C8d996420Ec4c0C4532D9, registry: 0x48898Dc7186b5AbD6028D12810CdeFf8eD8cb46B});
+        return NetworkConfig({implementation: 0xE1A3dd302709Fb0f1E957D1F6A68870c50E2c68a, registry: 0x527B7442bE029b95f7648D300E68e5B74DB10842});
     }
 
     function getAnvilEthConfig() public returns (NetworkConfig memory) {

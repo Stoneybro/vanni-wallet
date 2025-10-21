@@ -1,3 +1,3 @@
-export const AidraRegistryAddress="0x48898Dc7186b5AbD6028D12810CdeFf8eD8cb46B"
-export const AidraSmartWalletFactoryAddress="0x6D39aE04C757aE3658c957b240835Cc040923105"
+export const AidraRegistryAddress="0x527B7442bE029b95f7648D300E68e5B74DB10842"
+export const AidraSmartWalletFactoryAddress="0xF04e9A4388181B13a5f02248f143c02f9C00e364"
 

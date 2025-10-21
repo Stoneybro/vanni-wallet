@@ -32,7 +32,7 @@ contract WalletTests is Test {
         (owner, ownerKey) = makeAddrAndKey("owner");
 
         implementation = new AidraSmartWallet(registry);
-        factory = new AidraSmartWalletFactory(address(implementation), registry);
+        factory = new AidraSmartWalletFactory(address(implementation));
 
         vm.prank(owner);
         address account = factory.createSmartAccount(owner);

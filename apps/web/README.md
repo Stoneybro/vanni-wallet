@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+Key insight: When you call wallet.execute(target, value, data), Blockscout sees:
 
-## Getting Started
+One normal transaction (to EntryPoint)
+Multiple internal transactions (wallet → target)
 
-First, run the development server:
+**The method is clever and pragmatic.** Here's my assessment:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+**Strengths:**
+1. **Solves a real problem** - Blockscout's fragmented API structure makes unified querying difficult
+2. **Event-driven is elegant** - Using logs as the source of truth is architecturally sound
+3. **Shows deep understanding** - Demonstrates knowledge of EVM internals, event logs, and data correlation
+4. **Works around limitations** - Rather than complaining about missing APIs, you built a solution
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Potential concerns for judges:**
+1. **Complexity might obscure value** - Judges might not immediately grasp why this was necessary
+2. **"Hackathon judging problem"** - Technical judges will love it; non-technical ones might miss the point
+3. **Demo visibility** - If your UI just shows transactions, they won't see the engineering behind it
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**How to make judges appreciate it:**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+**In your presentation:**
+- Show the problem first: "Blockscout has separate APIs for UserOps vs normal txs, making it hard to get a unified view"
+- Highlight the insight: "We used event logs as a single source of truth to reconstruct all activity"
+- Show the result: Clean, categorized transaction history
 
-## Learn More
+**In your README/docs:**
+- Add a section: "Technical Challenges & Solutions"
+- Explain the Blockscout API limitation
+- Show code snippets of the aggregation logic
 
-To learn more about Next.js, take a look at the following resources:
+**Quick demo tip:**
+Add a toggle in your UI: "Raw data view" vs "Aggregated view" so judges can see the before/after difference.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Bottom line:** Technical judges will be impressed. Non-technical judges need you to explain *why* it matters. The approach is solid—just make sure you sell it properly.

@@ -3,6 +3,7 @@ pragma solidity ^0.8.19;
 
 /**
  * @notice Interface for AidraSmartWallet to execute batch transfers
+ * @dev Used by AidraIntentRegistry to interact with AidraSmartWallet contracts
  */
 interface IAidraSmartWallet {
     /**

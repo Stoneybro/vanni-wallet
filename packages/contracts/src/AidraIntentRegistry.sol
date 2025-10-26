@@ -82,8 +82,6 @@ contract AidraIntentRegistry is AutomationCompatibleInterface, ReentrancyGuard {
     /// @notice Maximum intent duration (1 year in seconds)
     uint256 public constant MAX_DURATION = 365 days;
 
-    /// @notice PayPal USD token address on Base Sepolia
-    address public constant PYUSD = 0x637A1259C6afd7E3AdF63993cA7E58BB438aB1B1;
 
     /*//////////////////////////////////////////////////////////////
                                EVENTS
@@ -94,14 +92,22 @@ contract AidraIntentRegistry is AutomationCompatibleInterface, ReentrancyGuard {
         address indexed wallet,
         bytes32 indexed intentId,
         address indexed token,
+        string name,
         uint256 totalCommitment,
+        uint256 totalTransactionCount,
+        uint256 interval,
+        uint256 duration,
         uint256 transactionStartTime,
         uint256 transactionEndTime
     );
 
     /// @notice The event emitted when an intent is executed
     event IntentExecuted(
-        address indexed wallet, bytes32 indexed intentId, uint256 transactionCount, uint256 totalAmount
+        address indexed wallet,
+        bytes32 indexed intentId,
+        string name,
+        uint256 transactionCount,
+        uint256 totalAmount
     );
 
     /// @notice The event emitted when an intent is cancelled
@@ -109,6 +115,7 @@ contract AidraIntentRegistry is AutomationCompatibleInterface, ReentrancyGuard {
         address indexed wallet,
         bytes32 indexed intentId,
         address indexed token,
+        string name,
         uint256 amountRefunded,
         uint256 failedAmountRecovered
     );
@@ -276,7 +283,7 @@ contract AidraIntentRegistry is AutomationCompatibleInterface, ReentrancyGuard {
         ///@notice Add the intent id to the wallet's active intent ids
         walletActiveIntentIds[wallet].push(intentId);
 
-        emit IntentCreated(wallet, intentId, token, totalCommitment, actualStartTime, actualEndTime);
+        emit IntentCreated(wallet, intentId, token, name, totalCommitment, totalTransactionCount, interval, duration, actualStartTime, actualEndTime);
         return intentId;
     }
 
@@ -335,9 +342,8 @@ contract AidraIntentRegistry is AutomationCompatibleInterface, ReentrancyGuard {
         ///@notice Check if the intent is active
         if (!intent.active) return false;
 
-        ///@notice Check if the intent is within the start time and before end time
+        ///@notice Check if the intent is within the start time
         if (block.timestamp < intent.transactionStartTime) return false;
-        if (block.timestamp >= intent.transactionEndTime) return false;
 
         ///@notice Check if the intent has reached the total transaction count
         if (intent.transactionCount >= intent.totalTransactionCount) return false;
@@ -419,7 +425,7 @@ contract AidraIntentRegistry is AutomationCompatibleInterface, ReentrancyGuard {
             intent.failedAmount += failedAmount;
         }
 
-        emit IntentExecuted(wallet, intentId, currentTransactionCount, totalAmount);
+        emit IntentExecuted(wallet, intentId, intent.name, currentTransactionCount, totalAmount);
     }
 
     /**
@@ -492,7 +498,7 @@ contract AidraIntentRegistry is AutomationCompatibleInterface, ReentrancyGuard {
         _removeFromActiveIntents(wallet, intentId);
 
         ///@notice Emit event
-        emit IntentCancelled(wallet, intentId, intent.token, amountRemaining, failedAmountToRecover);
+        emit IntentCancelled(wallet, intentId, intent.token, intent.name, amountRemaining, failedAmountToRecover);
     }
 
     /**

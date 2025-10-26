@@ -1,6 +1,6 @@
 import { createSmartAccountClient } from "permissionless";
 import { http } from "viem";
-import { arbitrumSepolia } from "viem/chains";
+import { sepolia } from "viem/chains";
 import { pimlicoClient, pimlicoBundlerUrl, publicClient } from "./pimlico";
 import { CustomSmartAccount } from "./customSmartAccount";
 
@@ -8,20 +8,20 @@ import { CustomSmartAccount } from "./customSmartAccount";
 export async function getSmartAccountClient(
   customSmartAccount: CustomSmartAccount
 ) {
- return createSmartAccountClient({
-  account: customSmartAccount,
-  chain: arbitrumSepolia,
-  client: publicClient,
-  bundlerTransport: http(pimlicoBundlerUrl),
-  paymaster: pimlicoClient,
-  userOperation: {
-    estimateFeesPerGas: async () => {
-      const { fast } = await pimlicoClient.getUserOperationGasPrice();
-      return {
-        maxFeePerGas: BigInt(fast.maxFeePerGas),
-        maxPriorityFeePerGas: BigInt(fast.maxPriorityFeePerGas),
-      };
-    }
-  }
-});
+  return createSmartAccountClient({
+    account: customSmartAccount,
+    chain: sepolia,
+    client: publicClient,
+    bundlerTransport: http(pimlicoBundlerUrl),
+    paymaster: pimlicoClient,
+    userOperation: {
+      estimateFeesPerGas: async () => {
+        const { fast } = await pimlicoClient.getUserOperationGasPrice();
+        return {
+          maxFeePerGas: BigInt(fast.maxFeePerGas),
+          maxPriorityFeePerGas: BigInt(fast.maxPriorityFeePerGas),
+        };
+      },
+    },
+  });
 }

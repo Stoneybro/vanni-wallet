@@ -1,0 +1,163 @@
+# Represents a deployed smart wallet
+type Wallet @entity {
+  id: ID!  # Wallet address (lowercase)
+  owner: String!  # Owner EOA address (lowercase)
+  createdAt: BigInt!
+  createdAtBlock: BigInt!
+  createdTxHash: String!  # Transaction hash of deployment
+  
+  # Aggregate stats
+  totalTransactions: BigInt!
+  totalExecutions: BigInt!
+  totalIntentExecutions: BigInt!
+  
+  # Relationships
+  transactions: [Transaction!]! @derivedFrom(field: "wallet")
+  commitments: [Commitment!]! @derivedFrom(field: "wallet")
+  intents: [Intent!]! @derivedFrom(field: "wallet")
+}
+
+# Comprehensive transaction/action entity
+type Transaction @entity {
+  id: ID!  # txHash-logIndex-suffix
+  wallet: Wallet!
+  
+  # Core fields
+  initiator: String!  # Who initiated (EntryPoint, Owner, or Registry)
+  target: String!  # Target address
+  value: BigInt!  # ETH value
+  selector: String!  # Function selector (bytes4) or "0x00000000"
+  data: String  # Calldata (optional, can be large)
+  
+  # Classification
+  actionType: String!  # "EXECUTE", "EXECUTE_BATCH", "BATCH", "INTENT_TRANSFER", "COMMITMENT_INCREASE", "COMMITMENT_DECREASE"
+  success: Boolean!
+  
+  # Token-specific (for token transfers)
+  token: String  # Token address (null for ETH)
+  recipient: String  # Recipient address (for transfers)
+  amount: BigInt  # Amount transferred
+  
+  # Intent-specific
+  intent_id: String  # Intent ID if this is an intent execution
+  transactionCount: BigInt  # Transaction number within intent
+  
+  # Batch execution linking (use entity reference instead of ID)
+  batchExecution: BatchExecution  # Links individual BATCH actions to their ExecuteBatch summary
+  
+  # Metadata
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: String!
+  logIndex: Int!
+}
+
+# Summary record for batch executions
+type BatchExecution @entity {
+  id: ID!  # txHash-batch (matches batchExecution_id in handlers)
+  wallet: Wallet!
+  
+  batchSize: BigInt!  # Number of calls in batch
+  totalValue: BigInt!  # Total ETH value
+  
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: String!
+  logIndex: Int!
+  
+  # Relationships - now properly derived
+  calls: [Transaction!]! @derivedFrom(field: "batchExecution")
+}
+
+# Tracks committed funds for intents per token
+type Commitment @entity {
+  id: ID!  # walletAddress-tokenAddress (both lowercase)
+  wallet: Wallet!
+  token: String!  # address(0) for ETH, token address for ERC20
+  amount: BigInt!  # Current committed amount
+  lastUpdated: BigInt!
+  lastUpdatedBlock: BigInt!
+}
+
+# Intent tracking with full lifecycle
+type Intent @entity {
+  id: ID!  # intentId (bytes32)
+  wallet: Wallet!
+  
+  # Basic info
+  token: String!  # Token being transferred
+  name: String!  # Intent name (now always available from events!)
+  
+  # Status
+  status: String!  # "ACTIVE", "COMPLETED", "CANCELLED"
+  
+  # Creation details (all from IntentCreated event)
+  createdAt: BigInt!
+  createdTxHash: String!
+  totalCommitment: BigInt!  # Total amount committed at creation
+  
+  # Schedule details (all from IntentCreated event)
+  transactionStartTime: BigInt!
+  transactionEndTime: BigInt!
+  interval: BigInt!  # Interval between executions in seconds
+  duration: BigInt!  # Total duration of intent
+  totalTransactionCount: BigInt!  # Total planned executions
+  
+  # Execution tracking
+  executionCount: BigInt!  # Number of times actually executed
+  totalValueTransferred: BigInt!  # Cumulative total successfully transferred
+  totalFailedAmount: BigInt!  # Cumulative failed transfers
+  lastExecutedAt: BigInt  # Last execution timestamp
+  
+  # Cancellation details (if cancelled)
+  cancelledAt: BigInt  # When cancelled
+  cancelledTxHash: String  # Transaction hash of cancellation
+  amountRefunded: BigInt  # Amount returned on cancellation
+  failedAmountRecovered: BigInt  # Failed amount recovered on cancellation
+  
+  # Recipients info (stored count, actual addresses/amounts fetched via contract read)
+  recipientCount: Int!  # Number of recipients per execution
+  
+  # Relationships
+  executions: [IntentExecution!]! @derivedFrom(field: "intent")
+}
+
+# Individual intent execution event (tracks each time an intent is executed)
+type IntentExecution @entity {
+  id: ID!  # intentId-transactionCount
+  intent: Intent!
+  
+  # Execution details
+  transactionCount: BigInt!  # Which execution number this was
+  totalValue: BigInt!  # Total attempted to transfer
+  failedAmount: BigInt!  # Amount that failed in this execution
+  successfulTransfers: Int!  # Count of successful transfers
+  failedTransfers: Int!  # Count of failed transfers
+  
+  # Metadata
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: String!
+  logIndex: Int!
+  
+  # Relationships
+  transfers: [IntentTransfer!]! @derivedFrom(field: "execution")
+}
+
+# Individual transfer within an intent execution
+type IntentTransfer @entity {
+  id: ID!  # intentId-transactionCount-recipient
+  intent: Intent!
+  execution: IntentExecution!
+  
+  recipient: String!  # Recipient address
+  token: String!  # Token address (matches intent token)
+  amount: BigInt!  # Amount attempted to transfer
+  success: Boolean!  # Whether transfer succeeded
+  
+  # Metadata
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  transactionHash: String!
+  logIndex: Int!
+}

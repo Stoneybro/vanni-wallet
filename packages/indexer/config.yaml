@@ -1,0 +1,48 @@
+# yaml-language-server: $schema=./node_modules/envio/evm.schema.json
+name: aidra-smart-wallet-indexer
+description: Indexer for Aidra ERC-4337 Smart Wallets with Intent System
+
+# Field selection for transaction data
+field_selection:
+  transaction_fields:
+    - hash
+
+networks:
+  - id: 11155111  # Ethereum Sepolia
+    start_block: 7527800
+    contracts:
+      # Factory contract for wallet deployments
+      - name: AidraSmartWalletFactory
+        address:
+          - 0x98579827CfC6833eaB1211519314f480915df145
+        handler: src/EventHandlers.ts
+        events:
+          - event: AccountCreated(address indexed account, address indexed owner)
+      
+      # Smart wallet implementation (and dynamically registered wallets)
+      - name: AidraSmartWallet
+        address:
+          - 0xD1d49aB947c9E5757196E3cb80e13689A375127c
+        handler: src/EventHandlers.ts
+        events:
+          - event: CommitmentDecreased(address indexed token, uint256 amount, uint256 newTotal)
+          - event: CommitmentIncreased(address indexed token, uint256 amount, uint256 newTotal)
+          - event: Executed(address indexed target, uint256 value, bytes data)
+          - event: ExecutedBatch(uint256 indexed batchSize, uint256 totalValue)
+          - event: IntentBatchTransferExecuted(bytes32 indexed intentId, uint256 indexed transactionCount, address indexed token, uint256 recipientCount, uint256 totalValue, uint256 failedAmount)
+          - event: IntentTransferSuccess(bytes32 indexed intentId, uint256 indexed transactionCount, address indexed recipient, address token, uint256 amount)
+          - event: TransferFailed(bytes32 indexed intentId, uint256 indexed transactionCount, address indexed recipient, address token, uint256 amount)
+          - event: WalletAction(address indexed initiator, address indexed target, uint256 value, bytes4 indexed selector, bool success, bytes32 actionType)
+      
+      # Intent registry for intent lifecycle management
+      - name: AidraIntentRegistry
+        address:
+          - 0xd77d00B7b600F52d84F807A80f723019D6A78535
+        handler: src/EventHandlers.ts
+        events:
+         - event: IntentCreated(address indexed wallet, bytes32 indexed intentId, address indexed token, string name, uint256 totalCommitment, uint256 totalTransactionCount, uint256 interval, uint256 duration, uint256 transactionStartTime, uint256 transactionEndTime)
+         - event: IntentExecuted(address indexed wallet, bytes32 indexed intentId, string name, uint256 transactionCount, uint256 totalAmount)
+         - event: IntentCancelled(address indexed wallet, bytes32 indexed intentId, address indexed token, string name, uint256 amountRefunded, uint256 failedAmountRecovered)
+         - event: WalletRegistered(address indexed wallet)
+
+unordered_multichain_mode: false

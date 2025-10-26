@@ -56,3 +56,12 @@ Thumbs.db
 # Temporary files
 *.tmp
 .cache
+
+ - WalletAction
+  - Executed
+  - ExecutedBatch
+  - CommitmentIncreased
+  - CommitmentDecreased
+  - IntentBatchTransferExecuted
+  - IntentTransferSuccess
+  - TransferFailed

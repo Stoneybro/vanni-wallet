@@ -48,7 +48,7 @@ Thumbs.db
 .idea
 *.swp
 *.swo
-*~
+*~ 
 
 # Turborepo
 .turbo

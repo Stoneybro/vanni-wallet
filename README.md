@@ -1,4 +1,4 @@
-# Aidra - AI-Powered ERC-4337 Smart Wallet
+# Vanni - AI-Powered ERC-4337 Smart Wallet
 
 > **"Send $50 PYUSD every Friday to my 5 employees for the next 3 months"** → Done in one transaction. No forms, no buttons, just conversation.
 
@@ -60,14 +60,14 @@ https://github.com/user-attachments/assets/1b60dd57-1284-466b-8e15-4bfe9a58d1e8
 
 ## 💡 Our Solution
 
-**Aidra is an ERC-4337 smart contract wallet with a natural language interface.**
+**Vanni is an ERC-4337 smart contract wallet with a natural language interface.**
 
 Instead of navigating forms and clicking buttons, you just chat with your wallet like ChatGPT:
 
 ```
 You: "Send $50 PYUSD every Friday to my contractor's address for the next 2 months"
 
-Aidra: "I'll set up a recurring payment:
+Vanni: "I'll set up a recurring payment:
 • $50 PYUSD per payment
 • Every 7 days (Fridays)
 • 8 total payments
@@ -77,7 +77,7 @@ Ready to proceed?"
 
 You: "Yes"
 
-Aidra: ✅ "Recurring payment created! Intent ID: 0xabc...
+Vanni: ✅ "Recurring payment created! Intent ID: 0xabc...
 First payment will execute this Friday at 9am.
 You can cancel anytime with 'cancel my Friday payment'"
 ```
@@ -109,7 +109,7 @@ Send to Eve:   21,000 gas
 TOTAL:        105,000 gas (~$15 at 150 gwei)
 ```
 
-Aidra (ERC-4337 batching):
+Vanni (ERC-4337 batching):
 ```
 Send to 5 people in ONE transaction: 58,000 gas (~$8.70)
 SAVINGS: 44.7% ($6.30 saved)
@@ -195,7 +195,7 @@ All 7 payment tools work with:
 ┌─────────────────────────────────────────────────────────────┐
 │                    SMART CONTRACTS                          │
 │  ┌──────────────────────┐  ┌──────────────────────┐        │
-│  │ AidraSmartWallet     │  │ AidraIntentRegistry  │        │
+│  │ VanniSmartWallet     │  │ VanniIntentRegistry  │        │
 │  │ • executeBatch()     │  │ • createIntent()     │        │
 │  │ • commitments        │  │ • executeIntent()    │        │
 │  │ • delegated calls    │  │ • cancelIntent()     │        │
@@ -267,7 +267,7 @@ All 7 payment tools work with:
    // EntryPoint validates signature
    require(ecrecover(userOpHash, signature) == owner);
    
-   // Calls AidraSmartWallet.executeBatch()
+   // Calls VanniSmartWallet.executeBatch()
    for (uint i = 0; i < calls.length; i++) {
        calls[i].target.call{value: calls[i].value}(calls[i].data);
    }
@@ -292,7 +292,7 @@ All 7 payment tools work with:
 
 7. **AI Confirmation** (100ms)
    ```
-   Aidra: ✅ "Batch transfer successful!
+   Vanni: ✅ "Batch transfer successful!
    • 0.1 ETH sent to 0x742d...
    • 0.2 ETH sent to 0x1234...
    
@@ -347,13 +347,13 @@ All 7 payment tools work with:
 
 | Contract | Address | Etherscan |
 |----------|---------|-----------|
-| **AidraSmartWalletFactory** | `0x98579827CfC6833eaB1211519314f480915df145` | [View](https://sepolia.etherscan.io/address/0x98579827CfC6833eaB1211519314f480915df145) |
-| **AidraSmartWallet (Implementation)** | `0xD1d49aB947c9E5757196E3cb80e13689A375127c` | [View](https://sepolia.etherscan.io/address/0xD1d49aB947c9E5757196E3cb80e13689A375127c) |
-| **AidraIntentRegistry** | `0xd77d00B7b600F52d84F807A80f723019D6A78535` | [View](https://sepolia.etherscan.io/address/0xd77d00B7b600F52d84F807A80f723019D6A78535) |
+| **VanniSmartWalletFactory** | `0x98579827CfC6833eaB1211519314f480915df145` | [View](https://sepolia.etherscan.io/address/0x98579827CfC6833eaB1211519314f480915df145) |
+| **VanniSmartWallet (Implementation)** | `0xD1d49aB947c9E5757196E3cb80e13689A375127c` | [View](https://sepolia.etherscan.io/address/0xD1d49aB947c9E5757196E3cb80e13689A375127c) |
+| **VanniIntentRegistry** | `0xd77d00B7b600F52d84F807A80f723019D6A78535` | [View](https://sepolia.etherscan.io/address/0xd77d00B7b600F52d84F807A80f723019D6A78535) |
 
 ### Key Contract Features
 
-#### 1. AidraSmartWallet.sol
+#### 1. VanniSmartWallet.sol
 
 **Custom batch execution with failure handling:**
 
@@ -402,7 +402,7 @@ function getAvailableBalance(address token) public view returns (uint256) {
 - Guarantees scheduled payments will execute
 - Works for both ETH and ERC-20 tokens
 
-#### 2. AidraIntentRegistry.sol
+#### 2. VanniIntentRegistry.sol
 
 **Intent creation with commitment:**
 
@@ -423,7 +423,7 @@ function createIntent(
     }
     
     // Lock funds in wallet
-    IAidraSmartWallet(msg.sender).increaseCommitment(token, totalCommitment);
+    IVanniSmartWallet(msg.sender).increaseCommitment(token, totalCommitment);
     
     // Store intent
     intentId = keccak256(abi.encodePacked(msg.sender, block.timestamp, name));
@@ -501,12 +501,12 @@ function performUpkeep(bytes calldata performData) external {
 networks:
   - id: 11155111  # Sepolia
     contracts:
-      - name: AidraSmartWalletFactory
+      - name: VanniSmartWalletFactory
         address: "0x98579827CfC6833eaB1211519314f480915df145"
         events:
           - WalletCreated
           
-      - name: AidraSmartWallet
+      - name: VanniSmartWallet
         address: "0xD1d49aB947c9E5757196E3cb80e13689A375127c"
         events:
           - Executed
@@ -514,7 +514,7 @@ networks:
           - CommitmentIncreased
           - CommitmentDecreased
           
-      - name: AidraIntentRegistry
+      - name: VanniIntentRegistry
         address: "0xd77d00B7b600F52d84F807A80f723019D6A78535"
         events:
           - IntentCreated
@@ -956,7 +956,7 @@ export function useBalances(smartAccountAddress?: string) {
 **Smart contracts handle both tokens:**
 
 ```solidity
-// contracts/AidraIntentRegistry.sol
+// contracts/VanniIntentRegistry.sol
 
 function createIntent(
     address token,  // address(0) = ETH, 0xCaC5... = PYUSD
@@ -971,7 +971,7 @@ function createIntent(
     }
     
     // Lock funds (works for both)
-    IAidraSmartWallet(msg.sender).increaseCommitment(token, totalCommitment);
+    IVanniSmartWallet(msg.sender).increaseCommitment(token, totalCommitment);
     
     // Store intent
     Intent storage intent = intents[intentId];
@@ -999,7 +999,7 @@ function executeIntent(bytes32 intentId) internal {
                 intent.amounts[i]
             );
             
-            IAidraSmartWallet(intent.wallet).executeFromRegistry(
+            IVanniSmartWallet(intent.wallet).executeFromRegistry(
                 intent.token,
                 0,  // No ETH value
                 data
@@ -1132,11 +1132,11 @@ Solution: **Chainlink Automation** (decentralized keeper network)
 **Implementation:**
 
 ```solidity
-// contracts/AidraIntentRegistry.sol
+// contracts/VanniIntentRegistry.sol
 
 import "@chainlink/contracts/src/v0.8/automation/AutomationCompatible.sol";
 
-contract AidraIntentRegistry is AutomationCompatibleInterface {
+contract VanniIntentRegistry is AutomationCompatibleInterface {
     
     // Chainlink calls this every block to check if work is needed
     function checkUpkeep(bytes calldata) 
@@ -1194,7 +1194,7 @@ contract AidraIntentRegistry is AutomationCompatibleInterface {
         for (uint256 i = 0; i < intent.recipients.length; i++) {
             if (intent.token == address(0)) {
                 // ETH transfer
-                IAidraSmartWallet(intent.wallet).executeFromRegistry(
+                IVanniSmartWallet(intent.wallet).executeFromRegistry(
                     intent.recipients[i],
                     intent.amounts[i],
                     ""
@@ -1206,7 +1206,7 @@ contract AidraIntentRegistry is AutomationCompatibleInterface {
                     intent.recipients[i],
                     intent.amounts[i]
                 );
-                IAidraSmartWallet(intent.wallet).executeFromRegistry(
+                IVanniSmartWallet(intent.wallet).executeFromRegistry(
                     intent.token,
                     0,
                     data
@@ -1226,7 +1226,7 @@ contract AidraIntentRegistry is AutomationCompatibleInterface {
             uint256 remaining = intent.totalCommitment - 
                 (intent.amounts[0] * intent.transactionCount);
             if (remaining > 0) {
-                IAidraSmartWallet(intent.wallet).decreaseCommitment(
+                IVanniSmartWallet(intent.wallet).decreaseCommitment(
                     intent.token,
                     remaining
                 );
@@ -1254,7 +1254,7 @@ async function registerAutomation() {
   const registry = new ethers.Contract(registryAddress, registryABI, signer);
   
   const registrationParams = {
-    name: "Aidra Intent Executor",
+    name: "Vanni Intent Executor",
     encryptedEmail: "0x",
     upkeepContract: INTENT_REGISTRY_ADDRESS,
     gasLimit: 500000,
@@ -1716,8 +1716,8 @@ Git
 
 1. **Clone repository**
 ```bash
-git clone https://github.com/yourusername/aidra-wallet.git
-cd aidra-wallet
+git clone https://github.com/yourusername/Vanni-wallet.git
+cd Vanni-wallet
 ```
 
 2. **Install dependencies**
@@ -1819,10 +1819,10 @@ MIT License - see [LICENSE](LICENSE) file
 
 ## 🔗 Important Links
 
-- **Live Demo:** [aidra-wallet.vercel.app](https://aidra-wallet.vercel.app)
+- **Live Demo:** [Vanni-wallet.vercel.app](https://Vanni-wallet.vercel.app)
 - **Video Demo:** [YouTube](https://youtube.com/watch?v=...)
 - **Pitch Deck:** [Google Slides](https://docs.google.com/...)
-- **GitHub:** [github.com/yourusername/aidra-wallet](https://github.com/...)
+- **GitHub:** [github.com/yourusername/Vanni-wallet](https://github.com/...)
 
 **Smart Contracts:**
 - Factory: [Sepolia Etherscan](https://sepolia.etherscan.io/address/0x98579827CfC6833eaB1211519314f480915df145)
